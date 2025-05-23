@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\BerandaController;
+use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\MejaController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -15,3 +18,13 @@ Route::get('/admin/logout',[LoginController::class,'logoutBackend'])->name('back
 
 // Beranda Admin
 Route::resource('/admin/dashboard',BerandaController::class, ['as'=>'backend'])->middleware('auth');
+
+// User Admin
+Route::resource('/admin/user',UserController::class, ['as'=>'backend'])->middleware('auth');
+Route::get('/admin/profile', [UserController::class, 'profil'])->name('profile')->middleware('auth');
+
+// Kategori Admin
+Route::resource('/admin/category',KategoriController::class, ['as'=>'backend'])->middleware('auth');
+
+// Meja Admin
+Route::resource('/admin/table',MejaController::class, ['as'=>'backend'])->middleware('auth');
