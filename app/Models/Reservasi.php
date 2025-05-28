@@ -24,6 +24,11 @@ class Reservasi extends Model
         return $this->belongsTo(Pelanggan::class);
     }
 
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

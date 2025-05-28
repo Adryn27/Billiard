@@ -13,16 +13,18 @@ return new class extends Migration
     {
         Schema::create('reservasi', function (Blueprint $table) {
             $table->id();
-            // $table->unsignedBigInteger('kategori_id');
+            $table->unsignedBigInteger('kategori_id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('meja_id');
             $table->unsignedBigInteger('pelanggan_id');
             $table->datetime('jam_mulai');
             $table->datetime('jam_berakhir');
             $table->enum('proses',['0','1','2'])->default('0'); //Pending, On-Going, Completed
+            $table->double('total');
+            $table->enum('metode_bayar',['0','1','2'])->nullable(); //Cash, Bank, E-Wallet
             $table->enum('status_bayar',['0','1'])->default('0'); //Belum Dibayar, Dibayar
             $table->timestamps();
-            // $table->foreign('kategori_id')->references('id')->on('kategori');
+            $table->foreign('kategori_id')->references('id')->on('kategori');
             $table->foreign('user_id')->references('id')->on('user');
             $table->foreign('meja_id')->references('id')->on('meja');
             $table->foreign('pelanggan_id')->references('id')->on('pelanggan');

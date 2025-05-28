@@ -101,6 +101,13 @@ class BerandaController extends Controller
             return redirect()->back()->withErrors(['meja_id' => 'Meja sedang digunakan pada rentang waktu tersebut. Silakan pilih waktu lain.'])->withInput();
         }
 
+        $meja = Meja::findOrFail($request->meja_id); // ambil data meja
+
+        $totalharga = Meja::with('kategori')->findOrFail($request->meja_id);
+        $hargaPerJam = $totalharga->kategori->harga; // Ambil harga dari relasi kategori
+        $durasi = (int)$request->durasi;
+        $totalBayar = $hargaPerJam * $durasi;
+
         // Cari atau buat pelanggan berdasarkan nama (untuk pelanggan langsung)
         $pelanggan = Pelanggan::firstOrCreate(
             ['nama' => $request->pelanggan_id]
@@ -108,12 +115,14 @@ class BerandaController extends Controller
 
         // Simpan data reservasi
         $reservasi = Reservasi::create([
+            'kategori_id'  => $meja->kategori_id,
             'pelanggan_id' => $pelanggan->id,
             'user_id'      => Auth::user()->id,
             'meja_id'      => $request->meja_id,
             'jam_mulai'    => $jamMulai,
             'jam_berakhir' => $jamBerakhir,
             'proses'       => '1', // On-Going
+            'total'        => $totalBayar,
             'status_bayar' => '0', // Belum dibayar
         ]);
 

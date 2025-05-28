@@ -12,7 +12,7 @@ class ReservasiController extends Controller
      */
     public function index()
     {
-        $reservasi=Reservasi::orderby('updated_at','asc')->get();
+        $reservasi=Reservasi::orderby('updated_at','asc')->where('status_bayar','0')->get();
         return view('Backend.v_beranda.reservasi', [
             'judul'=>'Reservation List',
             'index'=>$reservasi

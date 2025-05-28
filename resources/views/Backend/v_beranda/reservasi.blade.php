@@ -22,9 +22,9 @@
                   <th>No</th>
                   <th>Nama Pelanggan</th>
                   <th>Kategori</th>
-                  <th>Meja</th>
-                  <th></th>
-                  <th>Total</th>
+                  <th style="white-space: nowrap;">Meja</th>
+                  <th>Status</th>
+                  <th style="white-space: nowrap;">Total</th>
                   <th style="white-space: nowrap;">Aksi</th>
               </tr>
             </thead>
@@ -32,11 +32,19 @@
               @foreach ($index as $row)
                   <tr>
                       <td>{{ $loop->iteration }}</td>
-                      <td>{{ $row->nama_kategori }}</td>
-                      <td>Rp {{ number_format($row->harga), 0, ',', '.' }}</td>
-                      <td style="max-width: 300px; overflow-x: auto; white-space: nowrap;">
-                        <div style="overflow-x: auto;">{{ $row->fasilitas }}</div>
+                      <td>{{ $row->pelanggan->nama }}</td>
+                      <td>{{ $row->kategori->nama_kategori }}</td>
+                      <td style="white-space: nowrap;">Table {{ $row->meja->nomor_meja }}</td>
+                      <td>
+                        @if($row->proses == '0')
+                          <span class="badge bg-warning" style="color: white">Pending</span>
+                        @elseif($row->proses == '1')
+                          <span class="badge bg-danger" style="color: white">On-Going</span>
+                        @else
+                          <span class="badge bg-success" style="color: white">Completed</span>
+                        @endif
                       </td>
+                      <td style="white-space: nowrap;">Rp {{ number_format($row->total), 0, ',', '.' }}</td>
                       <td style="white-space: nowrap;">
                           <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editKategoriModal{{ $row->id }}"><i class="far fa-edit"></i> Edit</button>
                           <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#showKategoriModal{{ $row->id }}"><i class="far fa-image"></i> Show</button>
