@@ -13,4 +13,8 @@ class Meja extends Model
     {
         return $this->belongsTo(kategori::class);
     }
+    public function reservasi()
+    {
+        return $this->hasOne(Reservasi::class);
+    }
 }

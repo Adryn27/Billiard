@@ -13,7 +13,7 @@ class MejaController extends Controller
      */
     public function index()
     {
-        $meja=Meja::orderby('updated_at','desc')->get();
+        $meja=Meja::orderby('nomor_meja','asc')->get();
         $kategori=Kategori::orderby('updated_at','desc')->get();
         return view('backend.v_meja.index', [
             'judul'=>'Table',

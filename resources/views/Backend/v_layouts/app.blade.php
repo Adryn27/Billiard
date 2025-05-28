@@ -102,7 +102,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#sidebarLayouts">
+                <a href="{{ route('backend.customer.index') }}">
                   <i class="fas fa-users"></i>
                   <p>Customer</p>
                 </a>
@@ -376,6 +376,87 @@
               }
           }
     </script>
+
+    {{-- Countdown --}}
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+          const jamMulaiInput = document.querySelector('input[name="jam_mulai"]');
+          const durasiInput = document.querySelector('input[name="durasi"]');
+          const waktuMulaiBerakhirEl = document.getElementById('waktu_mulai_berakhir');
+          const countdownEl = document.getElementById('countdown');
+  
+          let countdownInterval;
+  
+          function formatJam(date) {
+              const h = date.getHours().toString().padStart(2, '0');
+              const m = date.getMinutes().toString().padStart(2, '0');
+              return `${h}:${m}`;
+          }
+  
+          function startCountdown(endTime) {
+              clearInterval(countdownInterval);
+  
+              function updateCountdown() {
+                  const now = new Date().getTime();
+                  const distance = endTime - now;
+  
+                  if (distance <= 0) {
+                      clearInterval(countdownInterval);
+                      countdownEl.textContent = "00:00:00";
+                      return;
+                  }
+  
+                  const hours = Math.floor(distance / (1000 * 60 * 60));
+                  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  
+                  countdownEl.textContent = 
+                      String(hours).padStart(2, '0') + ":" + 
+                      String(minutes).padStart(2, '0') + ":" + 
+                      String(seconds).padStart(2, '0');
+              }
+  
+              updateCountdown();
+              countdownInterval = setInterval(updateCountdown, 1000);
+          }
+  
+          function updateWaktuDanCountdown() {
+              const jamMulaiValue = jamMulaiInput.value;
+              const durasiValue = parseFloat(durasiInput.value);
+  
+              if (!jamMulaiValue || isNaN(durasiValue) || durasiValue <= 0) {
+                  waktuMulaiBerakhirEl.textContent = "--:-- - --:--";
+                  countdownEl.textContent = "--:--:--";
+                  clearInterval(countdownInterval);
+                  return;
+              }
+  
+              // Parse jam_mulai input (datetime-local format)
+              const mulaiDate = new Date(jamMulaiValue);
+              if (isNaN(mulaiDate.getTime())) {
+                  waktuMulaiBerakhirEl.textContent = "--:-- - --:--";
+                  countdownEl.textContent = "--:--:--";
+                  clearInterval(countdownInterval);
+                  return;
+              }
+  
+              // Hitung waktu berakhir (jam_mulai + durasi jam)
+              const durasiMs = durasiValue * 60 * 60 * 1000;
+              const akhirDate = new Date(mulaiDate.getTime() + durasiMs);
+  
+              waktuMulaiBerakhirEl.textContent = `${formatJam(mulaiDate)} - ${formatJam(akhirDate)}`;
+  
+              startCountdown(akhirDate.getTime());
+          }
+  
+          jamMulaiInput.addEventListener('input', updateWaktuDanCountdown);
+          durasiInput.addEventListener('input', updateWaktuDanCountdown);
+  
+          // Optional: update saat modal dibuka
+          updateWaktuDanCountdown();
+      });
+    </script>
+  
 
     <!-- Kaiadmin JS -->
     <script src="{{ asset('Backend/assets/js/kaiadmin.min.js') }}"></script>
