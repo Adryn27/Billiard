@@ -46,8 +46,7 @@
                       </td>
                       <td style="white-space: nowrap;">Rp {{ number_format($row->total), 0, ',', '.' }}</td>
                       <td style="white-space: nowrap;">
-                          <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editKategoriModal{{ $row->id }}"><i class="far fa-edit"></i> Edit</button>
-                          <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#showKategoriModal{{ $row->id }}"><i class="far fa-image"></i> Show</button>
+                          <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editKategoriModal{{ $row->id }}"><i class="fas fa-money-bill-wave"></i> Bayar</button>
                           <form action="{{ route('backend.category.destroy', $row->id) }}" method="POST" style="display: inline-block">
                               @method('delete')
                               @csrf
