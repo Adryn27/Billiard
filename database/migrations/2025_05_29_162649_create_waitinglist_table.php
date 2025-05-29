@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kategori', function (Blueprint $table) {
+        Schema::create('waitinglist', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_kategori')->unique();
-            $table->double('harga');
-            $table->text('fasilitas');
-            $table->string('foto')->nullable();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('pelanggan_id');
+            $table->datetime('jam_daftar');
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kategori');
+        Schema::dropIfExists('waitinglist');
     }
 };

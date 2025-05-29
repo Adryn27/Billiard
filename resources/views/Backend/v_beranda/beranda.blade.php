@@ -14,7 +14,7 @@
                         <i class="fas fa-list"></i> Reservation List
                     </button>
                 </a>
-                <a href="">
+                <a href="{{ route('backend.waitinglist.index') }}">
                     <button type="button" class="btn btn-secondary" >
                         <i class="fas fa-list"></i> Waiting List
                     </button>

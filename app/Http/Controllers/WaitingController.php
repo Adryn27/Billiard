@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Reservasi;
+use App\Models\Waiting;
 use Illuminate\Http\Request;
 
-class ReservasiController extends Controller
+class WaitingController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $reservasi=Reservasi::orderby('updated_at','asc')->whereNot(function($query) {$query->where('proses', '2')->where('status_bayar', '1');})->get();
-        return view('Backend.v_beranda.reservasi', [
-            'judul'=>'Reservation List',
-            'index'=>$reservasi
+        $waiting=Waiting::orderby('jam_daftar','desc')->get();
+        return view('Backend.v_beranda.waiting', [
+            'judul'=>'Waiting List',
+            'index'=>$waiting
         ]);
     }
 
@@ -56,16 +56,7 @@ class ReservasiController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $reservasi = Reservasi::findOrFail($id);
-
-        $request->validate([
-            'metode_bayar' => 'required',
-        ]);
-        $reservasi->metode_bayar = $request->metode_bayar;
-        $reservasi->status_bayar = '1'; // tandai sebagai dibayar
-        $reservasi->save();
-
-        return redirect()->back()->with('success', 'Pembayaran berhasil!');
+        //
     }
 
     /**

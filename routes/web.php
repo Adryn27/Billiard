@@ -7,6 +7,7 @@ use App\Http\Controllers\MejaController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WaitingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -36,3 +37,6 @@ Route::resource('/admin/customer',PelangganController::class, ['as'=>'backend'])
 
 // Reservasi List Admin
 Route::resource('/admin/reservasilist',ReservasiController::class, ['as'=>'backend'])->middleware('auth');
+
+// Waiting List Admin
+Route::resource('/admin/waitinglist',WaitingController::class, ['as'=>'backend'])->middleware('auth');

@@ -110,7 +110,8 @@ class BerandaController extends Controller
 
         // Cari atau buat pelanggan berdasarkan nama (untuk pelanggan langsung)
         $pelanggan = Pelanggan::firstOrCreate(
-            ['nama' => $request->pelanggan_id]
+            ['nama' => $request->pelanggan_id],
+            ['user_id' => Auth::id()]
         );
 
         // Simpan data reservasi
