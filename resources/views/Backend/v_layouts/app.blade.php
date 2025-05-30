@@ -181,7 +181,13 @@
             class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom"
           >
             <div class="container-fluid">
-
+              <nav
+                class="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex"
+              >
+                <div style="font-family: Arial, sans-serif; font-size: 18px; font-weight: 600; color: #333;">
+                  <b><span id="waktu-sekarang" style="background-color:#f0f0f0; padding: 6px 12px; border-radius: 5px; font-family: 'Courier New', monospace;"></span></b>
+                </div>
+              </nav>
               <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
 
                 <li class="nav-item topbar-user dropdown hidden-caret">
@@ -379,6 +385,40 @@
 
     {{-- Countdown --}}
     <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          document.querySelectorAll('.countdown').forEach(function (el) {
+              const startTime = new Date(el.dataset.starttime).getTime();
+              const endTime = new Date(el.dataset.endtime).getTime();
+      
+              function updateCountdown() {
+                  const now = new Date().getTime();
+      
+                  if (now < startTime) {
+                      el.innerText = "--:--:--";
+                      return;
+                  }
+      
+                  const distance = endTime - now;
+      
+                  if (distance <= 0) {
+                      el.innerText = "00:00:00";
+                      return;
+                  }
+      
+                  const hours = String(Math.floor(distance / (1000 * 60 * 60))).padStart(2, '0');
+                  const minutes = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+                  const seconds = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
+      
+                  el.innerText = `${hours}:${minutes}:${seconds}`;
+              }
+      
+              setInterval(updateCountdown, 1000);
+              updateCountdown();
+          });
+      });
+    </script>      
+    
+    {{-- <script>
       document.addEventListener('DOMContentLoaded', function () {
           const jamMulaiInput = document.querySelector('input[name="jam_mulai"]');
           const durasiInput = document.querySelector('input[name="durasi"]');
@@ -455,8 +495,28 @@
           // Optional: update saat modal dibuka
           updateWaktuDanCountdown();
       });
-    </script>
+    </script> --}}
   
+    {{-- Show Modal Reservasi --}}
+    {{-- @if(session('show_tambah_modal'))
+    <script>
+        window.onload = function() {
+            var modal = new bootstrap.Modal(document.getElementById('tambahModal'));
+            modal.show();
+        };
+    </script>
+    @endif --}}
+
+    {{-- Jam --}}
+    <script>
+      function updateWaktuSekarang() {
+          const now = new Date();
+          const formatted = now.toLocaleTimeString();
+          document.getElementById('waktu-sekarang').textContent = formatted;
+      }
+      setInterval(updateWaktuSekarang, 1000);
+      updateWaktuSekarang();
+    </script>
 
     <!-- Kaiadmin JS -->
     <script src="{{ asset('Backend/assets/js/kaiadmin.min.js') }}"></script>

@@ -49,7 +49,7 @@
                         @if ($row->status_bayar == 0)
                           <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#bayarModal{{ $row->id }}"><i class="fas fa-money-bill-wave"></i> Bayar</button>
                         @else
-                          <button class="btn btn-success btn-sm" disabled><i class="fas fa-check-circle"></i> Bayar</button>
+                          <button class="btn btn-secondary btn-sm"><i class="fas fa-print" onclick="printStruk()"></i> Cetak</button>
                         @endif
                       </td>
                   </tr>
@@ -70,7 +70,7 @@
               <h5 class="modal-title" id="bayarModalLabel"><b>Pembayaran</b></h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
           </div>
-            <form action="{{ route('backend.reservasilist.update', $row->id) }}" method="POST">
+            <form action="{{ route('backend.reservasilist.update', $row->id) }}" id="formBayar{{ $row->id }}" method="POST">
               @csrf
               @method('PUT')
               <div class="modal-body row">
@@ -109,6 +109,7 @@
                   <div class="form-group">
                       <label>Kembalian</label>
                       <input type="text" class="form-control" id="kembalian{{ $row->id }}" readonly>
+                      <input type="hidden" name="kembalian" id="kembalian_hidden{{ $row->id }}">
                   </div>
                 </div>
               </div>
@@ -119,6 +120,182 @@
       </div>
   </div>
 </div>
+
+{{-- Struk --}}
+<div id="struk" class="d-none">
+  <style>
+      .struk-container {
+          width: 300px;
+          padding: 20px;
+          margin: 0 auto;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          font-family: 'Courier New', Courier, monospace;
+          background-color: #fff;
+          color: #333;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .struk-header {
+          text-align: center;
+          font-size: 18px;
+          font-weight: bold;
+          margin-bottom: 15px;
+      }
+
+      .struk-header h1 {
+          margin: 0;
+          font-size: 24px;
+      }
+
+      .struk-header p {
+          margin: 5px 0;
+          font-size: 12px;
+      }
+      .struk-header img {
+          max-width: 30px; 
+          margin-bottom: 10px;
+      }
+
+      
+      .struk-info {
+          margin-bottom: 20px;
+      }
+      
+      .struk-info p {
+          margin: 5px 0;
+          font-size: 14px;
+          line-height: 1.5;
+      }
+
+      .struk-info .bold {
+          font-weight: bold;
+      }
+
+      .struk-detail {
+          margin-bottom: 20px;
+          border-top: 1px dashed #ddd;
+          padding-top: 10px;
+      }
+      
+      .struk-detail p{
+          text-align: center;
+          margin: 5px 0;
+          font-size: 14px;
+          line-height: 1.5;
+      }
+      .struk-detail table {
+          width: 100%;
+          border-collapse: collapse;
+      }
+
+      .struk-detail th,
+      .struk-detail td {
+          padding: 8px 0;
+          text-align: left;
+          font-size: 14px;
+      }
+
+      .struk-detail th {
+          text-align: center;
+      }
+
+      .total {
+          font-weight: bold;
+          font-size: 14px;
+      }
+      
+      .struk-bawah {
+          display: flex;
+          justify-content: space-between; 
+          align-items: center;           
+      }
+
+      .kiri {
+          font-weight: bold;
+          font-size: 14px;
+      }
+
+      .kanan {
+          font-size: 14px;
+      }
+
+      .struk-footer {
+          text-align: center;
+          margin-top: 20px;
+          font-size: 12px;
+      }
+
+      .struk-footer p {
+          margin: 5px 0;
+          color: #666;
+      }
+      @media print {
+          .struk-container {
+              width: 250px;
+              padding: 10px;
+              margin: 0;
+              border-radius: 0;
+              box-shadow: none;
+          }
+
+          .struk-header h1 {
+              font-size: 22px;
+          }
+
+          .struk-footer {
+              font-size: 10px;
+          }
+      }
+  </style>
+  <div class="struk-container">
+      <div class="struk-header">
+          <img src="{{ asset('Backend/Gambar/logo3.png') }}">
+          <h1>Cue Town Reserve</h1>
+          <p>Jl. Raya Bantar Gebang - Setu, Padurenan, Kec. Setu, Kota Bks, Jawa Barat</p>
+      </div>
+      <div class="struk-info">  
+          <p><span class="bold">Info  :</span>{{ $row->pelanggan->nama }}</p>
+          <p><span class="bold">Waktu:</span>{{ $row->created_at }} </p>
+          <p><span class="bold">Kasir:</span>{{ $row->user->nama }}</p>
+      </div>
+      <div class="struk-detail">
+          <table>
+              <thead>
+                  <tr>
+                      <th>Kategori</th>
+                      <th>Durasi</th>
+                      <th>Subtotal</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td>{{ $row->kategori->nama_kategori }}</td>
+                      <td>{{ $row->durasi }} Jam</td>
+                      <td>Rp{{ number_format($row->total), 0, ',', '.' }}</td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+      <div class="struk-bawah">
+          <div class="kiri">Total</div>
+          <div class="total">Rp{{ number_format($row->total), 0, ',', '.' }}</div>
+      </div>
+      <div class="struk-bawah">
+          <div class="kiri">Bayar</div>
+          <div class="kanan">Rp{{ number_format(session('dibayarkan')), 0, ',', '.' }}</div>
+      </div>
+      <div class="struk-bawah">
+          <div class="kiri">Kembalian</div>
+          <div class="kanan">Rp{{ number_format(session('kembalian')), 0, ',', '.' }}</div>
+      </div>
+      <div class="struk-footer">
+          <p>Terima kasih atas kunjungan Anda!</p>
+          <hr>
+          <p>Cue Town Reserve, Our Billiard Pool Hall</p>
+      </div>
+  </div>
+</div>
 @endforeach
 
 <script>
@@ -126,11 +303,13 @@
       const total = parseInt(document.getElementById('total' + id).value);
       const dibayar = parseInt(document.getElementById('dibayar' + id).value) || 0;
       const kembalianField = document.getElementById('kembalian' + id);
+      const kembalianHidden = document.getElementById('kembalian_hidden' + id);
       const btnBayar = document.getElementById('btnBayar' + id);
 
       if (dibayar >= total) {
           const kembalian = dibayar - total;
           kembalianField.value = kembalian.toLocaleString('id-ID');
+          kembalianHidden.value = kembalian;
           btnBayar.disabled = false;
       } else {
           kembalianField.value = 0;
@@ -138,4 +317,23 @@
       }
   }
 </script>
+
+<script>
+  function printStruk() {
+      var struk = document.getElementById("struk").innerHTML;
+
+      var print = document.createElement('iframe');
+      print.style.display = 'none';
+      document.body.appendChild(print);
+      print.contentDocument.write(struk);
+      print.contentWindow.print();
+      document.body.removeChild(print);
+  }
+
+  // Auto cetak setelah redirect
+  // window.onload = function() {
+  //     printStruk();
+  // }
+</script>
+
 @endsection

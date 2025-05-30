@@ -25,7 +25,13 @@
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $row->nama }}</td>
-                        <td>{{ $row->user->email ?? '-' }}</td>
+                        <td>
+                          @if($row->user && $row->user->role == 2)
+                              {{ $row->user->email }}
+                          @else
+                              -
+                          @endif
+                        </td>
                         <td>{{ $row->provider ?? '-' }}</td>
                     </tr>
                 @endforeach

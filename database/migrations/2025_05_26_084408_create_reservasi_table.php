@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('pelanggan_id');
             $table->datetime('jam_mulai');
             $table->datetime('jam_berakhir');
+            $table->string('durasi');
             $table->enum('proses',['0','1','2'])->default('0'); //Pending, On-Going, Completed
             $table->double('total');
             $table->enum('metode_bayar',['0','1','2'])->nullable(); //Cash, Bank, E-Wallet

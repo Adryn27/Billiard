@@ -14,9 +14,13 @@ return new class extends Migration
         Schema::create('waitinglist', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('kategori_id');
             $table->unsignedBigInteger('pelanggan_id');
             $table->datetime('jam_daftar');
             $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('user');
+            $table->foreign('kategori_id')->references('id')->on('kategori');
+            $table->foreign('pelanggan_id')->references('id')->on('pelanggan');
         });
     }
 

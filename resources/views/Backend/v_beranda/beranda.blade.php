@@ -38,6 +38,7 @@
 
                 };
                 $jam_berakhir = $row->reservasi?->jam_berakhir ?? null;
+                $items = $view->where('meja_id', $row->id);
                 $now = \Carbon\Carbon::now();
                 
             @endphp
@@ -47,18 +48,41 @@
                       <b>Table {{ $row->nomor_meja }} ({{ $row->kategori->nama_kategori }}) </b>
                     </div>
                     <div class="card-body">
+                        @if ($items->isEmpty())
+                            <div class="mb-2 text-secondary">
+                                <i class="fas fa-clock me-2 text-dark"></i>
+                                <strong>Waktu: -</strong><span id="waktu_mulai_berakhir"></span>
+                            </div>
+                            <div class="mb-2 text-secondary">
+                                <i class="fas fa-clock me-2 text-dark"></i>
+                                <strong>Durasi: - </strong><span id="durasi"></span>
+                            </div>
+                            <div class="bg-light rounded p-2 text-center">
+                                <div class="text-muted small">Sisa Waktu</div>
+                                <h4 class="fw-bold text-danger countdown">
+                                    --:--:--
+                                </h4>
+                            </div>
+                        @endif
+                        @foreach ($view->where('meja_id', $row->id) as $look)
                         <div class="mb-2 text-secondary">
                             <i class="fas fa-clock me-2 text-dark"></i>
-                            <strong>Waktu: </strong><span id="waktu_mulai_berakhir"></span>
+                            <strong>Waktu: {{ \Carbon\Carbon::parse($look->jam_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($look->jam_berakhir)->format('H:i') }}</strong><span id="waktu_mulai_berakhir"></span>
                         </div>
                         <div class="mb-2 text-secondary">
                             <i class="fas fa-clock me-2 text-dark"></i>
-                            <strong>Durasi: </strong><span id="durasi"></span>
+                            <strong>Durasi: {{ $look->durasi }} Jam</strong><span id="durasi"></span>
                         </div>
                         <div class="bg-light rounded p-2 text-center">
                             <div class="text-muted small">Sisa Waktu</div>
-                            <h4 class="fw-bold text-danger" id="countdown">--:--:--</h4>
+                            <h4 class="fw-bold text-danger countdown" 
+                                id="countdown-{{ $row->id }}" 
+                                data-starttime="{{ \Carbon\Carbon::parse($look->jam_mulai)->format('Y-m-d\TH:i:s') }}"
+                                data-endtime="{{ \Carbon\Carbon::parse($look->jam_berakhir)->format('Y-m-d\TH:i:s') }}">
+                                --:--:--
+                            </h4>
                         </div>
+                        @endforeach
                       {{-- <span id="countdown-{{ $row->id }}"
                         class="countdown"
                         data-endtime="{{ ($jam_berakhir && $jam_berakhir->gt($now)) ? $jam_berakhir->format('Y-m-d\TH:i:s') : '' }}">
@@ -142,60 +166,5 @@
         </div>
     </div>
 </div>
-
-{{-- Modal Edit Kategori --}}
-{{-- @foreach ($index as $row)
-    <div class="modal fade" id="editMejaModal{{ $row->id }}" tabindex="-1" aria-labelledby="editMejaModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editMejaModalLabel{{ $row->id }}"><b>Edit Meja</b></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="{{ route('backend.table.update', $row->id) }}" method="POST" enctype="multipart/form-data">
-                        @method('PUT')
-                        @csrf
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Kategori</label>
-                                    <select name="kategori_id" class="form-select @error('kategori_id') is-invalid @enderror">
-                                        <option value="" selected> - Pilih Katagori - </option>
-                                        @foreach ($create as $c)
-                                          @if (old('kategori_id', $row->kategori_id) == $c->id)
-                                            <option value="{{ $c->id }}" selected> {{ $c->nama_kategori }} </option>
-                                          @else
-                                            <option value="{{ $c->id }}"> {{ $c->nama_kategori }} </option>
-                                          @endif
-                                        @endforeach
-                                      </select>
-                                      @error('kategori_id')
-                                        <span class="invalid-feedback alert-danger" role="alert">{{ $message }}</span>
-                                      @enderror
-                                </div>
-                                <div class="form-group">
-                                    <label>Nomor Meja</label>
-                                    <input type="number" name="nomor_meja" class="form-control @error('nomor_meja') is-invalid @enderror" value="{{ old('nomor_meja', $row->nomor_meja) }}"></input>
-                                    @error('nomor_meja')
-                                        <div class="invalid-feedback alert-danger">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="text-center mt-3">
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Perbaharui</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Batal</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-@endforeach --}}
 
 @endsection

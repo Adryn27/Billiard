@@ -12,7 +12,21 @@ class ReservasiController extends Controller
      */
     public function index()
     {
-        $reservasi=Reservasi::orderby('updated_at','asc')->whereNot(function($query) {$query->where('proses', '2')->where('status_bayar', '1');})->get();
+        // $reservasi=Reservasi::orderby('created_at','asc')->whereNot(function($query) {$query->where('proses', '2')->where('status_bayar', '1');})->get();
+        $now = now();
+        $reservasi = Reservasi::where(function($query) use ($now) {
+            $query->where(function ($q) {
+                $q->where('proses', '2')
+                  ->where('status_bayar', '1');
+            })
+            ->where('updated_at', '>=', $now->subMinutes(10)) // masih tampil 10 menit setelah complete
+            ->orWhere(function ($q) {
+                $q->where('status_bayar', '!=', '1')
+                  ->orWhere('proses', '!=', '2');
+            });
+        })
+        ->orderBy('created_at', 'asc')
+        ->get();
         return view('Backend.v_beranda.reservasi', [
             'judul'=>'Reservation List',
             'index'=>$reservasi
@@ -64,6 +78,11 @@ class ReservasiController extends Controller
         $reservasi->metode_bayar = $request->metode_bayar;
         $reservasi->status_bayar = '1'; // tandai sebagai dibayar
         $reservasi->save();
+
+        session([
+            'dibayarkan' => $request->dibayar,
+            'kembalian' => $request->kembalian
+        ]);
 
         return redirect()->back()->with('success', 'Pembayaran berhasil!');
     }
