@@ -18,6 +18,37 @@ class BerandaController extends Controller
     
     public function updateStatusReservasi()
     {
+        // $now = Carbon::now();
+        // $mejas = Meja::all();
+
+        // foreach ($mejas as $meja) {
+        //     $reservasiAktif = Reservasi::where('meja_id', $meja->id)
+        //         ->whereIn('proses', ['0', '1'])
+        //         ->orderBy('jam_mulai', 'desc')
+        //         ->first();
+
+        //     if ($reservasiAktif) {
+        //         $jamMulai = Carbon::parse($reservasiAktif->jam_mulai);
+        //         $jamBerakhir = Carbon::parse($reservasiAktif->jam_berakhir);
+
+        //         if ($now->lt($jamMulai)) {
+        //             $bgColor = 'bg-warning'; // akan datang
+        //             $meja->status = '2'; // dipesan
+        //         } elseif ($now->between($jamMulai, $jamBerakhir)) {
+        //             $bgColor = 'bg-danger'; // sedang dipakai
+        //             $meja->status = '1'; // digunakan
+        //         } else {
+        //             $bgColor = 'bg-success'; // lewat waktunya
+        //             $meja->status = '0'; // tersedia
+        //         }
+        //     } else {
+        //         $bgColor = 'bg-success'; // tidak ada reservasi
+        //         $meja->status = '0'; // tersedia
+        //     }
+
+        //     $meja->save(); // Simpan status jika perlu
+        //     $meja->bgColor = $bgColor;
+        // }
         $now = Carbon::now();
 
         // Update reservasi selesai
@@ -94,7 +125,8 @@ class BerandaController extends Controller
         $this->updateStatusReservasi();
         $now = Carbon::now();
         $meja=Meja::orderby('nomor_meja','asc')->with('reservasi')->get();
-        $reservasi=Reservasi::get();
+
+        $reservasi=Reservasi::whereIn('proses', ['0', '1'])->where('jam_berakhir', '>=', $now)->orderBy('jam_mulai', 'asc')->get();
         return view('backend.v_beranda.beranda', [
             'judul'=>'Dashboard',
             'index'=>$meja,

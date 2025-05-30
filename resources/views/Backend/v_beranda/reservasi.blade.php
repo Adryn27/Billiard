@@ -49,7 +49,7 @@
                         @if ($row->status_bayar == 0)
                           <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#bayarModal{{ $row->id }}"><i class="fas fa-money-bill-wave"></i> Bayar</button>
                         @else
-                          <button class="btn btn-secondary btn-sm"><i class="fas fa-print" onclick="printStruk()"></i> Cetak</button>
+                          <button class="btn btn-secondary btn-sm" onclick="printStruk({{ $row->id }})"><i class="fas fa-print"></i> Cetak</button>
                         @endif
                       </td>
                   </tr>
@@ -122,7 +122,8 @@
 </div>
 
 {{-- Struk --}}
-<div id="struk" class="d-none">
+@if ($row->status_bayar == 1)
+<div id="struk-{{ $row->id }}" class="d-none">
   <style>
       .struk-container {
           width: 300px;
@@ -283,11 +284,11 @@
       </div>
       <div class="struk-bawah">
           <div class="kiri">Bayar</div>
-          <div class="kanan">Rp{{ number_format(session('dibayarkan')), 0, ',', '.' }}</div>
+          <div class="kanan">Rp{{ number_format(session('struk_data.' . $row->id)['dibayarkan'], 0, ',', '.') }}</div>
       </div>
       <div class="struk-bawah">
           <div class="kiri">Kembalian</div>
-          <div class="kanan">Rp{{ number_format(session('kembalian')), 0, ',', '.' }}</div>
+          <div class="kanan">Rp{{ number_format(session('struk_data.' . $row->id)['kembalian'], 0, ',', '.') }}</div>
       </div>
       <div class="struk-footer">
           <p>Terima kasih atas kunjungan Anda!</p>
@@ -296,6 +297,8 @@
       </div>
   </div>
 </div>
+@endif
+
 @endforeach
 
 <script>
@@ -319,20 +322,30 @@
 </script>
 
 <script>
-  function printStruk() {
-      var struk = document.getElementById("struk").innerHTML;
-
-      var print = document.createElement('iframe');
-      print.style.display = 'none';
-      document.body.appendChild(print);
-      print.contentDocument.write(struk);
-      print.contentWindow.print();
-      document.body.removeChild(print);
+  function printStruk(id) {
+    var struk = document.getElementById("struk-" + id).innerHTML;
+    var iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    
+    iframe.onload = function () {
+      iframe.contentDocument.body.innerHTML = struk;
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      setTimeout(() => document.body.removeChild(iframe), 500);
+    };
+    
+    iframe.src = 'about:blank';
   }
+  // function printStruk() {
+      // var struk = document.getElementById("struk").innerHTML;
 
-  // Auto cetak setelah redirect
-  // window.onload = function() {
-  //     printStruk();
+      // var print = document.createElement('iframe');
+      // print.style.display = 'none';
+      // document.body.appendChild(print);
+      // print.contentDocument.write(struk);
+      // print.contentWindow.print();
+      // document.body.removeChild(print);
   // }
 </script>
 

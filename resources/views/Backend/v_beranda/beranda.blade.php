@@ -29,17 +29,35 @@
         <div class="row g-3">
             @foreach ($index as $row)
             @php
-                // Tentukan warna background berdasarkan status
-                $bgColor = match($row->status) {
-                    '0' => 'bg-success',
-                    '1' => 'bg-danger',
-                    '2' => 'bg-warning',
-                    default => '0'
+                $now = \Carbon\Carbon::now('Asia/Jakarta');
 
-                };
-                $jam_berakhir = $row->reservasi?->jam_berakhir ?? null;
-                $items = $view->where('meja_id', $row->id);
-                $now = \Carbon\Carbon::now();
+                $reservasiMeja = $view->where('meja_id', $row->id)
+                                    ->whereIn('proses', [0, 1])
+                                    ->sortBy('jam_mulai')
+                                    ->first();
+
+                if ($reservasiMeja) {
+                    $mulai = \Carbon\Carbon::parse($reservasiMeja->jam_mulai, 'Asia/Jakarta');
+                    $berakhir = \Carbon\Carbon::parse($reservasiMeja->jam_berakhir, 'Asia/Jakarta');
+
+                    if ($now->lt($mulai)) {
+                        $bgColor = 'bg-warning';
+                    } elseif ($now->between($mulai, $berakhir)) {
+                        $bgColor = 'bg-danger';
+                    } else {
+                        $bgColor = 'bg-success';
+                    }
+                } else {
+                    $bgColor = 'bg-success';
+                }
+                // $items = $view->where('meja_id', $row->id);
+                $highlight = $view
+                ->where('meja_id', $row->id)
+                ->filter(function($item) use ($now) {
+                    return in_array($item->proses, [0,1]) && $now->lte(\Carbon\Carbon::parse($item->jam_berakhir));
+                })
+                ->sortBy('jam_mulai')
+                ->first();
                 
             @endphp
             <div class="col-md-3">
@@ -48,7 +66,42 @@
                       <b>Table {{ $row->nomor_meja }} ({{ $row->kategori->nama_kategori }}) </b>
                     </div>
                     <div class="card-body">
-                        @if ($items->isEmpty())
+                        @if ($highlight)
+                            <div class="mb-2 text-secondary">
+                                <i class="fas fa-clock me-2 text-dark"></i>
+                                <strong>Waktu: {{ \Carbon\Carbon::parse($highlight->jam_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($highlight->jam_berakhir)->format('H:i') }}</strong>
+                                <span id="waktu_mulai_berakhir"></span>
+                            </div>
+                            <div class="mb-2 text-secondary">
+                                <i class="fas fa-clock me-2 text-dark"></i>
+                                <strong>Durasi: {{ $highlight->durasi }} Jam</strong><span id="durasi"></span>
+                            </div>
+                            <div class="bg-light rounded p-2 text-center">
+                                <div class="text-muted small">Sisa Waktu</div>
+                                <h4 class="fw-bold text-danger countdown" 
+                                    id="countdown-{{ $row->id }}" 
+                                    data-starttime="{{ \Carbon\Carbon::parse($highlight->jam_mulai)->format('Y-m-d\TH:i:s') }}"
+                                    data-endtime="{{ \Carbon\Carbon::parse($highlight->jam_berakhir)->format('Y-m-d\TH:i:s') }}">
+                                    --:--:--
+                                </h4>
+                            </div>
+                        @else
+                            <div class="mb-2 text-secondary">
+                                <i class="fas fa-clock me-2 text-dark"></i>
+                                <strong>Waktu: -</strong><span id="waktu_mulai_berakhir"></span>
+                            </div>
+                            <div class="mb-2 text-secondary">
+                                <i class="fas fa-clock me-2 text-dark"></i>
+                                <strong>Durasi: - </strong><span id="durasi"></span>
+                            </div>
+                            <div class="bg-light rounded p-2 text-center">
+                                <div class="text-muted small">Sisa Waktu</div>
+                                <h4 class="fw-bold text-danger countdown">
+                                    --:--:--
+                                </h4>
+                            </div>
+                        @endif
+                        {{-- @if ($items->isEmpty())
                             <div class="mb-2 text-secondary">
                                 <i class="fas fa-clock me-2 text-dark"></i>
                                 <strong>Waktu: -</strong><span id="waktu_mulai_berakhir"></span>
@@ -68,8 +121,8 @@
                         <div class="mb-2 text-secondary">
                             <i class="fas fa-clock me-2 text-dark"></i>
                             <strong>Waktu: {{ \Carbon\Carbon::parse($look->jam_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($look->jam_berakhir)->format('H:i') }}</strong><span id="waktu_mulai_berakhir"></span>
-                        </div>
-                        <div class="mb-2 text-secondary">
+                        </div> --}}
+                        {{-- <div class="mb-2 text-secondary">
                             <i class="fas fa-clock me-2 text-dark"></i>
                             <strong>Durasi: {{ $look->durasi }} Jam</strong><span id="durasi"></span>
                         </div>
@@ -82,7 +135,7 @@
                                 --:--:--
                             </h4>
                         </div>
-                        @endforeach
+                        @endforeach --}}
                       {{-- <span id="countdown-{{ $row->id }}"
                         class="countdown"
                         data-endtime="{{ ($jam_berakhir && $jam_berakhir->gt($now)) ? $jam_berakhir->format('Y-m-d\TH:i:s') : '' }}">

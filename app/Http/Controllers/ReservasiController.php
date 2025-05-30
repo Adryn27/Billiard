@@ -79,9 +79,9 @@ class ReservasiController extends Controller
         $reservasi->status_bayar = '1'; // tandai sebagai dibayar
         $reservasi->save();
 
-        session([
+        session(['struk_data.' . $reservasi->id => [
             'dibayarkan' => $request->dibayar,
-            'kembalian' => $request->kembalian
+            'kembalian' => $request->kembalian]
         ]);
 
         return redirect()->back()->with('success', 'Pembayaran berhasil!');
