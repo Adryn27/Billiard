@@ -20,38 +20,47 @@
             <thead>
               <tr>
                   <th>No</th>
-                  <th>Nama Pelanggan</th>
-                  <th>Kategori</th>
                   <th style="white-space: nowrap;">Meja</th>
+                  <th>Nama Pelanggan</th>
+                  <th>Durasi</th>
                   <th>Status</th>
                   <th style="white-space: nowrap;">Total</th>
                   <th style="white-space: nowrap;">Aksi</th>
+                  <th>Waktu</th>
               </tr>
             </thead>
             <tbody>
               @foreach ($index as $row)
                   <tr>
                       <td>{{ $loop->iteration }}</td>
+                      <td style="white-space: nowrap;">Table {{ $row->meja->nomor_meja }} - {{ $row->kategori->nama_kategori }}</td>
                       <td>{{ $row->pelanggan->nama }}</td>
-                      <td>{{ $row->kategori->nama_kategori }}</td>
-                      <td style="white-space: nowrap;">Table {{ $row->meja->nomor_meja }}</td>
+                      <td>{{ $row->durasi }} Jam</td>
                       <td>
                         @if($row->proses == '0')
-                          <span class="badge bg-warning" style="color: white">Pending</span>
+                        <span class="badge bg-warning" style="color: white">Pending</span>
                         @elseif($row->proses == '1')
-                          <span class="badge bg-danger" style="color: white">On-Going</span>
+                        <span class="badge bg-danger" style="color: white">On-Going</span>
                         @else
-                          <span class="badge bg-success" style="color: white">Completed</span>
+                        <span class="badge bg-success" style="color: white">Completed</span>
                         @endif
                       </td>
                       <td style="white-space: nowrap;">Rp {{ number_format($row->total), 0, ',', '.' }}</td>
                       <td style="white-space: nowrap;">
-                        @if ($row->status_bayar == 0)
-                          <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#bayarModal{{ $row->id }}"><i class="fas fa-money-bill-wave"></i> Bayar</button>
+                        @if ($row->status_bayar == '0')
+                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#bayarModal{{ $row->id }}"><i class="fas fa-money-bill-wave"></i> Bayar</button>
                         @else
-                          <button class="btn btn-secondary btn-sm" onclick="printStruk({{ $row->id }})"><i class="fas fa-print"></i> Cetak</button>
+                        <button class="btn btn-secondary btn-sm" onclick="printStruk({{ $row->id }})"><i class="fas fa-print"></i> Cetak</button>
+                        @endif
+                        @if ($row->proses == '0'|| $row->proses == '1')
+                          <form action="{{ route('backend.reservasilist.destroy', $row->id) }}" method="POST" style="display:inline;">
+                              @csrf
+                              @method('DELETE')
+                              <button type="submit" class="btn btn-danger btn-sm show_confirm" data-konf-delete="{{ $row->pelanggan->nama }}"><i class="fas fa-trash"> Hapus</i></button>
+                          </form>
                         @endif
                       </td>
+                      <td class="text-muted">{{ $row->created_at }}</td>
                   </tr>
               @endforeach
             </tbody>
@@ -91,7 +100,7 @@
                         <option value="" selected> - Pilih Metode Bayar - </option>
                         <option value="0" {{ old('metode_bayar', $row->metode_bayar) == '0' ? 'selected' : '' }}>Cash</option>
                         <option value="1" {{ old('metode_bayar', $row->metode_bayar) == '1' ? 'selected' : '' }}>Bank</option>
-                        <option value="2" {{ old('metode_bayar', $row->metode_bayar) == '1' ? 'selected' : '' }}>E-Wallet</option>
+                        <option value="2" {{ old('metode_bayar', $row->metode_bayar) == '2' ? 'selected' : '' }}>E-Wallet</option>
                       </select>
                       @error('metode_bayar')
                         <span class="invalid-feedback alert-danger" role="alert">{{ $message }}</span>
@@ -257,7 +266,7 @@
       </div>
       <div class="struk-info">  
           <p><span class="bold">Info  :</span>{{ $row->pelanggan->nama }}</p>
-          <p><span class="bold">Waktu:</span>{{ $row->created_at }} </p>
+          <p><span class="bold">Waktu:</span>{{ $row->updated_at }} </p>
           <p><span class="bold">Kasir:</span>{{ $row->user->nama }}</p>
       </div>
       <div class="struk-detail">

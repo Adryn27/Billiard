@@ -44,9 +44,11 @@
                         <td>{{ $row->hp }}</td>
                         <td>
                             @if ($row->role == 1)
-                                <span class="badge bg-warning" style="color: white">Kasir</span>    
+                                <span class="badge bg-warning" style="color: white">Operator</span>    
                             @elseif ($row->role == 0)
                                 <span class="badge bg-success" style="color: white">Admin</span>    
+                            @elseif ($row->role == 3)
+                                <span class="badge bg-success" style="color: white">Owner</span>    
                             @endif
                         </td>
                         <td style="white-space: nowrap;">
@@ -101,7 +103,8 @@
                                 <select name="role" class="form-control @error('role') is-invalid @enderror">
                                     <option value="" {{ old('role') == '' ? 'selected' : '' }}>- Pilih Role -</option>
                                     <option value="0" {{ old('role') == '0' ? 'selected' : '' }}>Admin</option>
-                                    <option value="1" {{ old('role') == '1' ? 'selected' : '' }}>Kasir</option>
+                                    <option value="1" {{ old('role') == '1' ? 'selected' : '' }}>Operator</option>
+                                    <option value="3" {{ old('role') == '3' ? 'selected' : '' }}>Owner</option>
                                 </select>
                                 @error('role')
                                     <div class="invalid-feedback alert-danger">{{ $message }}</div>

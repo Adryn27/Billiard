@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Meja;
 use App\Models\Reservasi;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class ReservasiController extends Controller
@@ -19,7 +21,7 @@ class ReservasiController extends Controller
                 $q->where('proses', '2')
                   ->where('status_bayar', '1');
             })
-            ->where('updated_at', '>=', $now->subMinutes(10)) // masih tampil 10 menit setelah complete
+            ->where('updated_at', '>=', $now->subMinutes(10)) 
             ->orWhere(function ($q) {
                 $q->where('status_bayar', '!=', '1')
                   ->orWhere('proses', '!=', '2');
@@ -92,6 +94,74 @@ class ReservasiController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        // Cari reservasi berdasarkan ID
+        $reservasi = Reservasi::findOrFail($id);
+
+        // Ambil data meja terkait
+        $meja = Meja::find($reservasi->meja_id);
+
+        // Hapus reservasi
+        $reservasi->delete();
+
+        // Update status meja setelah reservasi dihapus
+        // Logika status meja bisa disesuaikan dengan kebutuhan
+        if ($meja) {
+            // Cek apakah ada reservasi lain yang masih aktif (proses != 2)
+            $aktif = Reservasi::where('meja_id', $meja->id)
+                ->where('proses', '!=', '2') // selain selesai
+                ->exists();
+
+            if ($aktif) {
+                // Jika masih ada reservasi aktif, meja dianggap digunakan (status = 1)
+                $meja->status = '1';
+            } else {
+                // Jika tidak ada reservasi aktif, meja kembali tersedia (status = 0)
+                $meja->status = '0';
+            }
+            $meja->save();
+        }
+
+        return redirect()->back()->with('success', 'Reservasi berhasil dihapus dan status meja diperbarui.');
+    }
+
+    public function transaksi(Request $request)
+    {
+        if ($request->action == 'export_pdf') {
+            $query = Reservasi::orderby('updated_at', 'desc')->where('status_bayar', '1');
+        
+            if ($request->start_date && $request->end_date) {
+                $query->whereBetween('created_at', [
+                    $request->start_date . ' 00:00:00',
+                    $request->end_date . ' 23:59:59',
+                ]);
+            }
+        
+            $data = $query->get();
+            $judul = 'Transaction'; // ← Tambahkan variabel ini
+        
+            $pdf = Pdf::loadView('backend.v_report.cetak', [
+                'data' => $data,
+                'judul' => $judul, // ← Sertakan ke dalam array
+            ]);
+            
+            return $pdf->download('transaksi.pdf');
+        }
+
+        $query=Reservasi::orderby('updated_at','desc')->where('status_bayar', '1');
+
+        if ($request->start_date && $request->end_date) {
+            try {
+                $query->whereBetween('created_at', [
+                    $request->start_date . ' 00:00:00',
+                    $request->end_date . ' 23:59:59',
+                ]);
+            } catch (\Exception $e) {
+                return back()->with('error', 'Format tanggal salah.');
+            }
+        }
+        return view('backend.v_report.transaksi', [
+            'judul'=>'Transaction',
+            'index'=>$query->latest()->get(),
+        ]);
     }
 }

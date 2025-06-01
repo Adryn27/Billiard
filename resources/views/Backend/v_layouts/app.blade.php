@@ -132,13 +132,7 @@
                 <h4 class="text-section">Report</h4>
               </li>
               <li class="nav-item">
-                <a href="#maps">
-                  <i class="fas fa-history"></i>
-                  <p>History Table</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#maps">
+                <a href="{{ route('transaksi') }}">
                   <i class="fas fa-money-bill-wave"></i>
                   <p>Transaction</p>
                 </a>
@@ -498,14 +492,14 @@
     </script> --}}
   
     {{-- Show Modal Reservasi --}}
-    {{-- @if(session('show_tambah_modal'))
+    @if(session('show_tambah_modal'))
     <script>
         window.onload = function() {
             var modal = new bootstrap.Modal(document.getElementById('tambahModal'));
             modal.show();
         };
     </script>
-    @endif --}}
+    @endif
 
     {{-- Jam --}}
     <script>

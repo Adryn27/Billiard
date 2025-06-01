@@ -220,4 +220,81 @@
     </div>
 </div>
 
+<div class="col-12">
+    <div class="card mt-3">
+      <div class="card-body">
+        <div class="table-responsive table-hover mt-3">
+          <table
+            id="dataTable"
+            class="table table-striped table-bordered"
+          >
+            <thead>
+              <tr>
+                  <th>No</th>
+                  <th>Meja</th>
+                  <th>Pelanggan</th>
+                  <th>Durasi</th>
+                  <th>Waktu</th>
+                  <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach ($index as $meja)
+              @php
+                $pelangganList = $view->where('meja_id', $meja->id);
+              @endphp
+              <tr>
+                <td>{{ $loop->iteration }}</td>
+                <td>Table {{ $meja->nomor_meja }} - {{ $meja->kategori->nama_kategori }}</td>
+                <td>
+                  @if ($pelangganList->isNotEmpty())
+                    @foreach ($view->where('meja_id', $meja->id) as $row)
+                      {{ $row->pelanggan->nama }} <br>
+                    @endforeach
+                  @else
+                    -
+                  @endif
+                </td>
+                <td>
+                  @if ($pelangganList->isNotEmpty())
+                    @foreach ($view->where('meja_id', $meja->id) as $row)
+                      {{ $row->durasi }} Jam<br>
+                    @endforeach
+                  @else
+                    -
+                  @endif
+                </td>
+                <td>
+                  @if ($pelangganList->isNotEmpty())
+                    @foreach ($view->where('meja_id', $meja->id) as $row)
+                      {{ \Carbon\Carbon::parse($row->jam_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($row->jam_berakhir)->format('H:i') }}<br>
+                    @endforeach
+                  @else
+                    -
+                  @endif
+                </td>
+                <td>
+                  @if ($pelangganList->isNotEmpty())
+                    @foreach ($view->where('meja_id', $meja->id) as $row)
+                      @if($row->proses == '0')
+                        <span class="badge bg-warning" style="color: white">Pending</span><br>
+                      @elseif($row->proses == '1')
+                        <span class="badge bg-danger" style="color: white">On-Going</span><br>
+                      @else
+                        <span class="badge bg-success" style="color: white">Completed</span><br>
+                      @endif
+                    @endforeach
+                  @else
+                    -
+                  @endif
+                </td>
+              </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+</div>
+
 @endsection

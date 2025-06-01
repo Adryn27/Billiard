@@ -105,14 +105,14 @@
       </div>
   </div>
 </div>
-@if(session('show_reservasi_modal'))
+{{-- @if(session('show_reservasi_modal'))
 <script>
     window.onload = function() {
         var myModal = new bootstrap.Modal(document.getElementById('tambahModal'));
         myModal.show();
     };
 </script>
-@endif
+@endif --}}
 
 
 @endsection

@@ -32,7 +32,7 @@ Route::resource('/admin/category',KategoriController::class, ['as'=>'backend'])-
 // Meja Admin
 Route::resource('/admin/table',MejaController::class, ['as'=>'backend'])->middleware('auth');
 
-// Meja Admin
+// Pelanggan Admin
 Route::resource('/admin/customer',PelangganController::class, ['as'=>'backend'])->middleware('auth');
 
 // Reservasi List Admin
@@ -40,3 +40,7 @@ Route::resource('/admin/reservasilist',ReservasiController::class, ['as'=>'backe
 
 // Waiting List Admin
 Route::resource('/admin/waitinglist',WaitingController::class, ['as'=>'backend'])->middleware('auth');
+
+// Transaksi Admin
+Route::get('/admin/transaction', [ReservasiController::class, 'transaksi'])->name('transaksi')->middleware('auth');
+Route::post('/admin/transaction/report',[ReservasiController::class,'cetak'])->name('laporan.cetak')->middleware('auth');
