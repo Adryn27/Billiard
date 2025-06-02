@@ -126,25 +126,46 @@ class ReservasiController extends Controller
 
     public function transaksi(Request $request)
     {
+        // if ($request->action == 'export_pdf') {
+        //     $query = Reservasi::orderby('updated_at', 'desc')->where('status_bayar', '1');
+        
+        //     if ($request->start_date && $request->end_date) {
+        //         $query->whereBetween('created_at', [
+        //             $request->start_date . ' 00:00:00',
+        //             $request->end_date . ' 23:59:59',
+        //         ]);
+        //     }
+        
+        //     $data = $query->get();
+        //     $judul = 'Transaction'; // ← Tambahkan variabel ini
+        
+        //     $pdf = Pdf::loadView('backend.v_report.cetak', [
+        //         'data' => $data,
+        //         'judul' => $judul, // ← Sertakan ke dalam array
+        //     ]);
         if ($request->action == 'export_pdf') {
             $query = Reservasi::orderby('updated_at', 'desc')->where('status_bayar', '1');
         
-            if ($request->start_date && $request->end_date) {
+            $tanggalAwal = $request->start_date;
+            $tanggalAkhir = $request->end_date;
+        
+            if ($tanggalAwal && $tanggalAkhir) {
                 $query->whereBetween('created_at', [
-                    $request->start_date . ' 00:00:00',
-                    $request->end_date . ' 23:59:59',
+                    $tanggalAwal . ' 00:00:00',
+                    $tanggalAkhir . ' 23:59:59',
                 ]);
             }
         
             $data = $query->get();
-            $judul = 'Transaction'; // ← Tambahkan variabel ini
-        
+            
             $pdf = Pdf::loadView('backend.v_report.cetak', [
                 'data' => $data,
-                'judul' => $judul, // ← Sertakan ke dalam array
+                'judul' => 'Transaction',
+                'tanggalAwal' => $tanggalAwal,
+                'tanggalAkhir' => $tanggalAkhir,
             ]);
             
-            return $pdf->download('transaksi.pdf');
+            return $pdf->stream('Transaksi.pdf');
         }
 
         $query=Reservasi::orderby('updated_at','desc')->where('status_bayar', '1');

@@ -1,8 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Data Transaksi</title>
+    <title>{{ $judul }}</title>
     <style>
+        .header {
+        text-align: center;
+        margin-bottom: 10px;
+        }
+
+        .logo {
+            width: 60px;
+            height: auto;
+            margin-bottom: 5px;
+        }
+
+        .judul {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .date {
+            font-size: 12px;
+            color: #666;
+            margin: 0;
+        }
         table {
             border-collapse: collapse;
             width: 100%;
@@ -18,7 +39,11 @@
     </style>
 </head>
 <body>
-    <h3>Data Transaksi</h3>
+    <div class="header">
+        <img src="{{ public_path('Backend/gambar/logo3.png') }}" class="logo">
+        <h1 class="judul">Data Transaksi</h1>
+        <p class="date">Tanggal: {{ $tanggalAwal }} s.d {{ $tanggalAkhir }}</p>
+    </div>
     <table>
         <thead>
             <tr>
