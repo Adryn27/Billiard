@@ -11,7 +11,7 @@ use App\Http\Controllers\WaitingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('Frontend.v_beranda.beranda');
 });
 
 // Login Admin
@@ -44,3 +44,6 @@ Route::resource('/admin/waitinglist',WaitingController::class, ['as'=>'backend']
 // Transaksi Admin
 Route::get('/admin/transaction', [ReservasiController::class, 'transaksi'])->name('transaksi')->middleware('auth');
 Route::post('/admin/transaction/report',[ReservasiController::class,'cetak'])->name('laporan.cetak')->middleware('auth');
+
+// Frontend
+Route::get('/', [BerandaController::class, 'frontendIndex'])->name('frontend');

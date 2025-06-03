@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kategori;
 use App\Models\Meja;
 use App\Models\Pelanggan;
 use App\Models\Reservasi;
@@ -135,6 +136,22 @@ class BerandaController extends Controller
         ]);
     }
 
+    public function frontendIndex(Request $request)
+    {
+        $this->updateStatusReservasi();
+        $now = Carbon::now();
+        $meja=Meja::orderby('nomor_meja','asc')->with('reservasi')->get();
+        $kategori=Kategori::get();
+
+        $reservasi=Reservasi::whereIn('proses', ['0', '1'])->where('jam_berakhir', '>=', $now)->orderBy('jam_mulai', 'asc')->get();
+        return view('frontend.v_beranda.beranda', [
+            'judul'=>'Cue Town Reserve',
+            'index'=>$meja,
+            'now'=>$now,
+            'view'=>$reservasi,
+            'kategori'=>$kategori
+        ]);
+    }
     /**
      * Show the form for creating a new resource.
      */
