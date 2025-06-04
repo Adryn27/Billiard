@@ -11,7 +11,7 @@ use App\Http\Controllers\WaitingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('Frontend.v_beranda.beranda');
+    return redirect()->route('beranda');
 });
 
 // Login Admin
@@ -46,4 +46,15 @@ Route::get('/admin/transaction', [ReservasiController::class, 'transaksi'])->nam
 Route::post('/admin/transaction/report',[ReservasiController::class,'cetak'])->name('laporan.cetak')->middleware('auth');
 
 // Frontend
-Route::get('/', [BerandaController::class, 'frontendIndex'])->name('frontend');
+Route::get('/', [BerandaController::class, 'frontendIndex'])->name('beranda');
+Route::get('/reservation', [ReservasiController::class, 'reservasiCreate'])->name('reservasi');
+
+// Reservasi
+Route::post('/reservation/create', [ReservasiController::class, 'reservasiStore'])->name('reserved');
+
+// Google
+Route::get('auth/google', [PelangganController::class, 'redirectToGoogle']);
+Route::get('auth/google/callback', [PelangganController::class, 'handleGoogleCallback']);
+
+// Logout 
+Route::post('/logout', [PelangganController::class, 'logout'])->name('logout');

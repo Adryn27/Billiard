@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Meja;
+use App\Models\Pelanggan;
 use App\Models\Reservasi;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReservasiController extends Controller
 {
@@ -35,6 +38,101 @@ class ReservasiController extends Controller
         ]);
     }
 
+    public function reservasiCreate()
+    {
+        $meja=Meja::orderby('nomor_meja','asc')->get();
+        return view('Frontend.v_reservasi.index', [
+            'judul'=>'Dashboard',
+            'index'=>$meja,
+        ]);
+    }
+
+    public function reservasiStore(Request $request)
+    {
+        $request->validate([
+            'meja_id' => 'required',
+            'jam_mulai' => 'required',
+            'durasi' => 'required|numeric|min:1',
+            'metode_bayar' => 'required|in:0,1,2', // Cash, Bank, E-wallet
+        ]);        
+
+        // Hitung jam berakhir dari jam mulai + durasi
+        $jamMulai = Carbon::parse($request->jam_mulai);
+        $jamBerakhir = $jamMulai->copy()->addHours((int)$request->durasi);
+
+        $now = Carbon::now();
+
+        // Cek apakah ada reservasi aktif di meja yang sama dan waktu saling tumpang tindih
+        $conflict = Reservasi::where('meja_id', $request->meja_id)
+        ->where('proses', '!=', '2') // Abaikan yang sudah selesai
+        ->where(function ($query) use ($jamMulai, $jamBerakhir) {
+            $query->where(function ($q) use ($jamMulai, $jamBerakhir) {
+                $q->where('jam_mulai', '<', $jamBerakhir)
+                ->where('jam_berakhir', '>', $jamMulai);
+            });
+        })
+        ->exists();
+
+        $existingReservasi = Reservasi::where('meja_id', $request->meja_id)
+            ->where('proses', '!=', '2')
+            ->orderBy('jam_berakhir', 'desc')
+            ->first();
+
+        if (!$conflict) {
+            $proses = '1'; // on going karena meja tidak ada yang pakai di waktu ini
+        } else {
+            if ($existingReservasi && $jamMulai->greaterThanOrEqualTo($existingReservasi->jam_berakhir)) {
+                // mulai setelah reservasi terakhir selesai => pending
+                $proses = '0';
+            } else {
+                return redirect()->back()->withErrors(['meja_id' => 'Meja sedang digunakan pada rentang waktu tersebut. Silakan pilih waktu lain.'])->withInput();
+            }
+        }
+
+        // Tentukan proses awal
+        if ($jamMulai->lessThanOrEqualTo($now)) {
+            $proses = '1'; // on-going langsung
+        } else {
+            $proses = '0'; // pending
+        }
+
+        $meja = Meja::findOrFail($request->meja_id); // ambil data meja
+
+        $totalharga = Meja::with('kategori')->findOrFail($request->meja_id);
+        $hargaPerJam = $totalharga->kategori->harga; // Ambil harga dari relasi kategori
+        $durasi = (int)$request->durasi;
+        $totalBayar = $hargaPerJam * $durasi;
+
+        // Cari atau buat pelanggan berdasarkan nama (untuk pelanggan langsung)
+        $user = Auth::user();
+        $pelanggan = Pelanggan::firstOrCreate(
+            ['user_id' => $user->id],
+            ['nama' => $user->name] // Sesuaikan dengan kolom nama di tabel users
+        );
+
+        $reservasi = Reservasi::create([
+            'kategori_id'  => $meja->kategori_id,
+            'pelanggan_id' => $pelanggan->id,
+            'user_id'      => Auth::user()->id,
+            'meja_id'      => $request->meja_id,
+            'jam_mulai'    => $jamMulai,
+            'jam_berakhir' => $jamBerakhir,
+            'durasi'       => $durasi,
+            'proses'       => $proses, 
+            'total'        => $totalBayar,
+            'status_bayar' => '1', // dibayar
+            'metode_bayar' => $request->metode_bayar, // Tambahkan ini
+        ]);
+        
+        // Update status meja menjadi 1 (on-going)
+        $meja = Meja::find($request->meja_id);
+        if ($meja) {
+            $meja->status = $proses == '1' ? '1' : '2'; // 1 = digunakan, 2 = dipesan
+            $meja->save();
+        }
+
+        return redirect()->route('beranda')->with('success', 'Data Berhasil Tersimpan');
+    }
     /**
      * Show the form for creating a new resource.
      */
