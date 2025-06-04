@@ -16,6 +16,7 @@
         <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic" rel="stylesheet" type="text/css" />
         <!-- SimpleLightbox plugin CSS-->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.datatables.net/2.3.1/css/dataTables.dataTables.css" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{{ asset('frontend/css/styles.css') }}" rel="stylesheet" />
     </head>
@@ -43,7 +44,7 @@
                                     <span>{{ Auth::user()->nama }}</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="#">History</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('history') }}">History</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form method="POST" action="{{ route('logout') }}">
@@ -78,6 +79,7 @@
               </div>
             </div>
         </footer>
+          
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- SimpleLightbox plugin JS-->
@@ -123,5 +125,50 @@
                 });
             });
         </script>  
+        <!-- Sweet Alert -->
+        <script src="{{ asset('Backend/sweetalert/sweetalert2.all.min.js') }}"></script>
+        @if (session('success'))
+        <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: "{{ session('success') }}"
+        })
+        </script>
+        @endif
+
+        <script type="text/javascript">
+        // Konfirmasi delete
+        $('.show_confirm').click(function(event){
+            var form=$(this).closest("form");
+            var konfdelete=$(this).data("konf-delete");
+            event.preventDefault();
+            Swal.fire({
+            title: 'Konfirmasi Hapus Data?',
+            html: "Data yang dihapus <strong>" + konfdelete + "</strong> tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, dihapus',
+            cancelButtonText: 'Batal',
+            }).then((result)=>{
+            if(result.isConfirmed){
+                Swal.fire('Terhapus!', 'Data berhasil dihapus.', 'success')
+                .then(()=>{
+                    form.submit();
+                });
+            }
+            });
+        });
+        </script>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/2.3.1/js/dataTables.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let table = new DataTable('#myTable');
+            });
+        </script>
     </body>
 </html>

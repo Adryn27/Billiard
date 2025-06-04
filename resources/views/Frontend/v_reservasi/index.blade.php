@@ -126,7 +126,6 @@
                     <div class="form-floating mb-3">
                         <select name="metode_bayar" class="form-control @error('metode_bayar') is-invalid @enderror" required>
                             <option value="" selected> - Pilih Metode Bayar - </option>
-                            <option value="0" {{ old('metode_bayar', $row->metode_bayar) == '0' ? 'selected' : '' }}>Cash</option>
                             <option value="1" {{ old('metode_bayar', $row->metode_bayar) == '1' ? 'selected' : '' }}>Bank</option>
                             <option value="2" {{ old('metode_bayar', $row->metode_bayar) == '2' ? 'selected' : '' }}>E-Wallet</option>
                           </select>

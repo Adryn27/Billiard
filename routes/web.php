@@ -48,6 +48,7 @@ Route::post('/admin/transaction/report',[ReservasiController::class,'cetak'])->n
 // Frontend
 Route::get('/', [BerandaController::class, 'frontendIndex'])->name('beranda');
 Route::get('/reservation', [ReservasiController::class, 'reservasiCreate'])->name('reservasi');
+Route::get('/history', [BerandaController::class, 'historyIndex'])->name('history');
 
 // Reservasi
 Route::post('/reservation/create', [ReservasiController::class, 'reservasiStore'])->name('reserved');

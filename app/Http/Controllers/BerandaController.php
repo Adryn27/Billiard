@@ -152,6 +152,22 @@ class BerandaController extends Controller
             'kategori'=>$kategori
         ]);
     }
+
+    public function HistoryIndex()
+    {
+        $userId = Auth::user()->id;
+
+        $now = now();
+
+        $reservasi = Reservasi::where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('Frontend.v_beranda.history', [
+            'judul' => 'History',
+            'index' => $reservasi
+        ]);
+    }
     /**
      * Show the form for creating a new resource.
      */

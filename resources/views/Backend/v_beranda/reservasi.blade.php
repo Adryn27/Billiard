@@ -293,11 +293,11 @@
       </div>
       <div class="struk-bawah">
           <div class="kiri">Bayar</div>
-          <div class="kanan">Rp{{ number_format(session('struk_data.' . $row->id)['dibayarkan'], 0, ',', '.') }}</div>
+          <div class="kanan">Rp{{ number_format(session('struk_data.' . $row->id)['dibayarkan'] ?? 0, 0, ',', '.') }}</div>
       </div>
       <div class="struk-bawah">
           <div class="kiri">Kembalian</div>
-          <div class="kanan">Rp{{ number_format(session('struk_data.' . $row->id)['kembalian'], 0, ',', '.') }}</div>
+          <div class="kanan">Rp{{ number_format(session('struk_data.' . $row->id)['kembalian'] ?? 0, 0, ',', '.') }}</div>
       </div>
       <div class="struk-footer">
           <p>Terima kasih atas kunjungan Anda!</p>
