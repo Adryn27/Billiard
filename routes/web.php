@@ -47,11 +47,11 @@ Route::post('/admin/transaction/report',[ReservasiController::class,'cetak'])->n
 
 // Frontend
 Route::get('/', [BerandaController::class, 'frontendIndex'])->name('beranda');
-Route::get('/reservation', [ReservasiController::class, 'reservasiCreate'])->name('reservasi');
-Route::get('/history', [BerandaController::class, 'historyIndex'])->name('history');
+Route::get('/reservation', [ReservasiController::class, 'reservasiCreate'])->name('reservasi')->middleware('auth');
+Route::get('/history', [BerandaController::class, 'historyIndex'])->name('history')->middleware('auth');
 
 // Reservasi
-Route::post('/reservation/create', [ReservasiController::class, 'reservasiStore'])->name('reserved');
+Route::post('/reservation/create', [ReservasiController::class, 'reservasiStore'])->name('reserved')->middleware('auth');
 
 // Google
 Route::get('auth/google', [PelangganController::class, 'redirectToGoogle']);

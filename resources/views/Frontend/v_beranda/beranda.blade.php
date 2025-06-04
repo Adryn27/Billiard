@@ -62,9 +62,15 @@
                 <h1 class="text-white font-weight-bold">Cue Town Reserve, Our Billiard Pool Hall</h1>
                 <hr class="divider" />
             </div>
+            @if (Auth::check())
             <div class="col-lg-8 align-self-baseline">
                 <a class="btn btn-primary btn-xl" href="{{ route('reservasi') }}">Reservation</a>
             </div>
+            @else
+            <div class="col-lg-8 align-self-baseline">
+              <a class="btn btn-primary btn-xl" href="{{ url('auth/google') }}">Reservation</a>
+            </div>             
+            @endif
         </div>
     </div>
 </header>
