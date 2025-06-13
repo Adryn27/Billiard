@@ -1,0 +1,18 @@
+Hak Akses User
+1. Admin
+	Email	:admin@gmail.com
+	Password:P@55word
+2. Owner
+	Email	:owner@gmail.com
+	Password:P@55word
+3. Operator/Kasir
+	Email	:kasir@gmail.com
+	Password:P@55word
+4. Pelanggan 
+	(Via Google Melalui Frontend)
+
+Nama Anggota Kelompok 1
+1. Arnanda Surya Mukti (19231904)
+2. Danu Pangestu (19231413)
+3. Fitra Hakiki Firdaus (19231213)
+4. Willy Andryan (19230468)
